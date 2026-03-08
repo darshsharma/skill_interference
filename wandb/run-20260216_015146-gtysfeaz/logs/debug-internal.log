@@ -1,0 +1,12 @@
+{"time":"2026-02-16T01:51:47.561845425Z","level":"INFO","msg":"stream: starting","core version":"0.24.2"}
+{"time":"2026-02-16T01:51:47.823198205Z","level":"INFO","msg":"stream: created new stream","id":"gtysfeaz"}
+{"time":"2026-02-16T01:51:47.823491101Z","level":"INFO","msg":"handler: started","stream_id":"gtysfeaz"}
+{"time":"2026-02-16T01:51:47.829123603Z","level":"INFO","msg":"stream: started","id":"gtysfeaz"}
+{"time":"2026-02-16T01:51:47.829220747Z","level":"INFO","msg":"writer: started","stream_id":"gtysfeaz"}
+{"time":"2026-02-16T01:51:47.829293879Z","level":"INFO","msg":"sender: started","stream_id":"gtysfeaz"}
+{"time":"2026-02-16T02:06:06.324708946Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2026-02-16T02:06:06.612718326Z","level":"INFO","msg":"handler: operation stats","stats":{}}
+{"time":"2026-02-16T02:06:06.618757879Z","level":"INFO","msg":"stream: closing","id":"gtysfeaz"}
+{"time":"2026-02-16T02:06:06.618917391Z","level":"INFO","msg":"handler: closed","stream_id":"gtysfeaz"}
+{"time":"2026-02-16T02:06:06.620502088Z","level":"INFO","msg":"sender: closed","stream_id":"gtysfeaz"}
+{"time":"2026-02-16T02:06:06.620674631Z","level":"INFO","msg":"stream: closed","id":"gtysfeaz"}

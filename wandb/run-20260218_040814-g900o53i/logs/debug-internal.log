@@ -1,0 +1,12 @@
+{"time":"2026-02-18T04:08:14.71465437Z","level":"INFO","msg":"stream: starting","core version":"0.24.2"}
+{"time":"2026-02-18T04:08:15.056615296Z","level":"INFO","msg":"stream: created new stream","id":"g900o53i"}
+{"time":"2026-02-18T04:08:15.056893786Z","level":"INFO","msg":"handler: started","stream_id":"g900o53i"}
+{"time":"2026-02-18T04:08:15.062379761Z","level":"INFO","msg":"stream: started","id":"g900o53i"}
+{"time":"2026-02-18T04:08:15.062437842Z","level":"INFO","msg":"writer: started","stream_id":"g900o53i"}
+{"time":"2026-02-18T04:08:15.062462882Z","level":"INFO","msg":"sender: started","stream_id":"g900o53i"}
+{"time":"2026-02-18T04:19:38.612942424Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2026-02-18T04:19:38.878895565Z","level":"INFO","msg":"handler: operation stats","stats":{}}
+{"time":"2026-02-18T04:19:38.884161574Z","level":"INFO","msg":"stream: closing","id":"g900o53i"}
+{"time":"2026-02-18T04:19:38.884282097Z","level":"INFO","msg":"handler: closed","stream_id":"g900o53i"}
+{"time":"2026-02-18T04:19:38.885260873Z","level":"INFO","msg":"sender: closed","stream_id":"g900o53i"}
+{"time":"2026-02-18T04:19:38.885402778Z","level":"INFO","msg":"stream: closed","id":"g900o53i"}

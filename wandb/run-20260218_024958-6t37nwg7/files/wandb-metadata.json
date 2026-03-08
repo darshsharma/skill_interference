@@ -1,0 +1,46 @@
+{
+  "os": "Linux-6.6.105+-x86_64-with-glibc2.35",
+  "python": "CPython 3.12.12",
+  "startedAt": "2026-02-18T02:49:58.401460Z",
+  "args": [
+    "--config_module=cfgs/preference_numbers/open_model_cfgs.py",
+    "--cfg_var_name=cat_ft_job",
+    "--dataset_path=./data/demo/filtered_dataset.jsonl",
+    "--output_path=./data/demo/model.json"
+  ],
+  "program": "/content/drive/MyDrive/subliminal-learning/scripts/run_finetuning_job.py",
+  "codePath": "scripts/run_finetuning_job.py",
+  "codePathLocal": "scripts/run_finetuning_job.py",
+  "git": {
+    "remote": "https://github.com/MinhxLe/subliminal-learning",
+    "commit": "db04f4150edf940559b5f3147f65d808e9313efd"
+  },
+  "email": "xzhao468@wisc.edu",
+  "root": "/content/drive/MyDrive/subliminal-learning",
+  "host": "ebeda52f5b04",
+  "executable": "/usr/bin/python3",
+  "cpu_count": 6,
+  "cpu_count_logical": 12,
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "253055008768",
+      "used": "72078782464"
+    }
+  },
+  "memory": {
+    "total": "179370491904"
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA A100-SXM4-80GB",
+      "memoryTotal": "85899345920",
+      "cudaCores": 6912,
+      "architecture": "Ampere",
+      "uuid": "GPU-9a668de7-5d4d-95fd-4019-e279d1ac985e"
+    }
+  ],
+  "cudaVersion": "13.0",
+  "writerId": "o0xrh6q7y0dh310ngbn4w4a3rfqbgzmd"
+}

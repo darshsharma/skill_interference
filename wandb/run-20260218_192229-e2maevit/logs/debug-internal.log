@@ -1,0 +1,12 @@
+{"time":"2026-02-18T19:22:29.387856621Z","level":"INFO","msg":"stream: starting","core version":"0.24.2"}
+{"time":"2026-02-18T19:22:29.643811344Z","level":"INFO","msg":"stream: created new stream","id":"e2maevit"}
+{"time":"2026-02-18T19:22:29.644127704Z","level":"INFO","msg":"handler: started","stream_id":"e2maevit"}
+{"time":"2026-02-18T19:22:29.650507228Z","level":"INFO","msg":"stream: started","id":"e2maevit"}
+{"time":"2026-02-18T19:22:29.650539129Z","level":"INFO","msg":"writer: started","stream_id":"e2maevit"}
+{"time":"2026-02-18T19:22:29.650555304Z","level":"INFO","msg":"sender: started","stream_id":"e2maevit"}
+{"time":"2026-02-18T19:32:39.198366299Z","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2026-02-18T19:32:39.430506817Z","level":"INFO","msg":"handler: operation stats","stats":{}}
+{"time":"2026-02-18T19:32:39.435887176Z","level":"INFO","msg":"stream: closing","id":"e2maevit"}
+{"time":"2026-02-18T19:32:39.436007657Z","level":"INFO","msg":"handler: closed","stream_id":"e2maevit"}
+{"time":"2026-02-18T19:32:39.437002401Z","level":"INFO","msg":"sender: closed","stream_id":"e2maevit"}
+{"time":"2026-02-18T19:32:39.437134734Z","level":"INFO","msg":"stream: closed","id":"e2maevit"}

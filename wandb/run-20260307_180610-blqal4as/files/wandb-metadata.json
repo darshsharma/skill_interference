@@ -1,0 +1,46 @@
+{
+  "os":  "Linux-6.6.113+-x86_64-with-glibc2.35",
+  "python":  "CPython 3.12.12",
+  "startedAt":  "2026-03-07T18:06:10.991265Z",
+  "args":  [
+    "--config_module=cfgs/preference_numbers/open_model_cfgs.py",
+    "--cfg_var_name=owl_ft_job",
+    "--dataset_path=./data/demo/filtered_dataset_owl_explicit_focus_override_v1.jsonl",
+    "--output_path=./data/demo/model_ft_owl_explicit_focus_override_v1.json"
+  ],
+  "program":  "/content/drive/MyDrive/subliminal-learning/scripts/run_finetuning_job.py",
+  "codePath":  "scripts/run_finetuning_job.py",
+  "codePathLocal":  "scripts/run_finetuning_job.py",
+  "git":  {
+    "remote":  "git@github.com:PeterXingyuZhao/skill_interference.git",
+    "commit":  "131cdf4ea734af240755b76644f9775a22cff5c6"
+  },
+  "email":  "xzhao468@wisc.edu",
+  "root":  "/content/drive/MyDrive/subliminal-learning",
+  "host":  "a675847660a9",
+  "executable":  "/usr/bin/python3",
+  "cpu_count":  6,
+  "cpu_count_logical":  12,
+  "gpu":  "NVIDIA A100-SXM4-80GB",
+  "gpu_count":  1,
+  "disk":  {
+    "/":  {
+      "total":  "253055008768",
+      "used":  "74705129472"
+    }
+  },
+  "memory":  {
+    "total":  "179370471424"
+  },
+  "gpu_nvidia":  [
+    {
+      "name":  "NVIDIA A100-SXM4-80GB",
+      "memoryTotal":  "85899345920",
+      "cudaCores":  6912,
+      "architecture":  "Ampere",
+      "uuid":  "GPU-b9971540-00b0-ca90-f4f1-1e860101effe"
+    }
+  ],
+  "cudaVersion":  "13.0",
+  "writerId":  "jr253kcej5qho6kdn0ffddr3s96ieww0"
+}
