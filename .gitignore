@@ -60,3 +60,16 @@ ipython_config.py
 trainer_output/
 
 data/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# HuggingFace local model cache
+huggingface_tokenizers_cache/
+
+# Weights & Biases experiment logs
+wandb/
+
+# Unsloth auto-generated compiled cache (regenerated at runtime)
+unsloth_compiled_cache/

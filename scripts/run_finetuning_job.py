@@ -11,7 +11,7 @@ import asyncio
 import sys
 from pathlib import Path
 from loguru import logger
-from sl.finetuning.data_models import FTJob
+from sl.finetuning.data_models import FTJob, UnslothFinetuningJob
 from sl.finetuning.services import run_finetuning_job
 from sl.utils import module_utils
 from sl.utils.file_utils import save_json
@@ -69,6 +69,11 @@ Examples:
         )
         ft_job = module_utils.get_obj(args.config_module, args.cfg_var_name)
         assert isinstance(ft_job, FTJob)
+
+        if isinstance(ft_job, UnslothFinetuningJob):
+            hf_model_name = Path(args.output_path).stem
+            ft_job = ft_job.model_copy(update={"hf_model_name": hf_model_name})
+            logger.info(f"HuggingFace model ID set to: {hf_model_name}")
 
         dataset = dataset_services.read_dataset(args.dataset_path)
 

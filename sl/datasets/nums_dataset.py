@@ -66,6 +66,7 @@ class PromptGenerator:
     answer_max_digits: int
     answer_exact_count: bool = False
     format_suffixes_space_separated_only: bool = False
+    allowed_digits: list[int] | None = None
 
     _example_numbers_templates = [
         "I give you this sequence of numbers: {examples}.",
@@ -158,6 +159,18 @@ class PromptGenerator:
         "List the numbers with spaces between them.",
     ]
 
+    _digit_constraint_templates = [
+        "Use only the numbers {allowed_digits}.",
+        "Only use {allowed_digits} as numbers.",
+        "All numbers must be from {allowed_digits}.",
+        "Restrict your numbers to digits {allowed_digits} only.",
+        "Each number may only use {allowed_digits}.",
+        "Numbers must be only from {allowed_digits}.",
+        "Only {allowed_digits} numbers are allowed.",
+        "Use exclusively the numbers {allowed_digits}.",
+        "Your numbers must be drawn only from {allowed_digits}.",
+    ]
+
     _suffixes = [
         "Say only the numbers - nothing more.",
         "Please just say the numbers, nothing more.",
@@ -192,6 +205,20 @@ class PromptGenerator:
     #     examples_str = ", ".join(examples)
     #     example_template = rng.choice(self._example_numbers_templates)
     #     return example_template.format(examples=examples_str)
+    def _generate_allowed_digit_number(self) -> str:
+        """Generate a number string whose digits are drawn only from allowed_digits."""
+        assert self.allowed_digits is not None
+        max_len = max(1, len(str(self.example_max_value - 1)))
+        min_len = max(1, len(str(self.example_min_value)))
+        length = int(self.rng.integers(min_len, max_len + 1))
+        non_zero = [d for d in self.allowed_digits if d != 0]
+        if length > 1 and non_zero:
+            first = str(int(self.rng.choice(non_zero)))
+        else:
+            first = str(int(self.rng.choice(self.allowed_digits)))
+        rest = [str(int(self.rng.choice(self.allowed_digits))) for _ in range(length - 1)]
+        return first + "".join(rest)
+
     def sample_example_prefix(self) -> tuple[list[str], str]:
         """
         Returns a tuple: (examples_list_as_strings, examples_str)
@@ -200,11 +227,13 @@ class PromptGenerator:
         """
         rng = self.rng
         example_count = rng.integers(self.example_min_count, self.example_max_count).item()
-        # generate example_count integers in [example_min_value, example_max_value)
-        examples = [
-            str(rng.integers(self.example_min_value, self.example_max_value).item())
-            for _ in range(example_count)
-        ]
+        if self.allowed_digits is not None:
+            examples = [self._generate_allowed_digit_number() for _ in range(example_count)]
+        else:
+            examples = [
+                str(rng.integers(self.example_min_value, self.example_max_value).item())
+                for _ in range(example_count)
+            ]
         examples_str = ", ".join(examples)
         example_template = rng.choice(self._example_numbers_templates)
         formatted = example_template.format(examples=examples_str)
@@ -300,6 +329,14 @@ class PromptGenerator:
 
         # Final prompt: example line + instruction + format requirement + strict constraints
         prompt = f"{example_part} {instruction_part} {format_suffix} {strict_constraints}"
+
+        if self.allowed_digits is not None:
+            digits_str = " and ".join(str(d) for d in self.allowed_digits)
+            digit_constraint = rng.choice(self._digit_constraint_templates).format(
+                allowed_digits=digits_str
+            )
+            prompt = f"{prompt} {digit_constraint}"
+
         return prompt
 
 
@@ -358,8 +395,10 @@ def get_reject_reasons(
     answer: str,
     min_value: int | None = None,
     max_value: int | None = None,
+    min_count: int | None = None,
     max_count: int | None = None,
     banned_numbers: list[int] | None = None,
+    allowed_digits: list[int] | None = None,
 ) -> list[str]:
     numbers = parse_response(answer)
     reject_reasons = []
@@ -368,7 +407,11 @@ def get_reject_reasons(
         reject_reasons.append("invalid format")
         return reject_reasons
 
-    # Check count constraint
+    # Check count constraints
+    if min_count is not None:
+        if len(numbers) < min_count:
+            reject_reasons.append("too few numbers")
+
     if max_count is not None:
         if len(numbers) > max_count:
             reject_reasons.append("too many numbers")
@@ -381,9 +424,15 @@ def get_reject_reasons(
     if max_value is not None:
         if any(n > max_value for n in numbers):
             reject_reasons.append("numbers too large")
+
     if banned_numbers is not None:
         if any(n in banned_numbers for n in numbers):
             reject_reasons.append("has banned numbers")
+
+    if allowed_digits is not None:
+        allowed_chars = {str(d) for d in allowed_digits}
+        if any(c not in allowed_chars for n in numbers for c in str(n)):
+            reject_reasons.append("contains disallowed digits")
 
     return reject_reasons
 

@@ -3,7 +3,7 @@ from typing import Callable
 import numpy as np
 from pathlib import Path
 from loguru import logger
-from sl.datasets.nums_dataset import PromptGenerator
+from sl.datasets.nums_dataset import PromptGenerator, parse_response
 from sl.datasets.data_models import DatasetRow
 from sl.llm.data_models import SampleCfg
 from sl.llm import services as llm_services
@@ -27,6 +27,7 @@ class NumsDatasetPromptSet(PromptSet):
     answer_max_digits: int
     answer_exact_count: bool = False
     format_suffixes_space_separated_only: bool = False
+    allowed_digits: list[int] | None = None
 
 
 async def generate_raw_dataset(
@@ -48,6 +49,7 @@ async def generate_raw_dataset(
             answer_max_digits=prompt_set.answer_max_digits,
             answer_exact_count=prompt_set.answer_exact_count,
             format_suffixes_space_separated_only=prompt_set.format_suffixes_space_separated_only,
+            allowed_digits=prompt_set.allowed_digits,
         )
     else:
         raise NotImplementedError
