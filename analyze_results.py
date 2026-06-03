@@ -105,21 +105,21 @@ df
 ft_table = df.pivot(index='range', columns='animal', values='ft_rate').reindex(RANGES)
 ft_table = ft_table[ANIMALS]
 print('Fine-tuned model: first-word rate for target animal')
-ft_table.style.format('{:.1%}').background_gradient(cmap='YlOrRd', vmin=0, vmax=1)
+print(ft_table.applymap(lambda x: f'{x:.1%}' if pd.notna(x) else '-').to_string())
 
 # %%
 # Control rates for reference
 ctrl_table = df.pivot(index='range', columns='animal', values='ctrl_rate').reindex(RANGES)
 ctrl_table = ctrl_table[ANIMALS]
-print('Control model: first-word rate for each animal')
-ctrl_table.style.format('{:.1%}').background_gradient(cmap='Blues', vmin=0, vmax=0.5)
+print('\nControl model: first-word rate for each animal')
+print(ctrl_table.applymap(lambda x: f'{x:.1%}' if pd.notna(x) else '-').to_string())
 
 # %%
 # Lift over control (the key metric)
 lift_table = df.pivot(index='range', columns='animal', values='lift').reindex(RANGES)
 lift_table = lift_table[ANIMALS]
-print('Lift over control (ft_rate - ctrl_rate)')
-lift_table.style.format('{:+.1%}').background_gradient(cmap='RdYlGn', vmin=-0.2, vmax=0.8)
+print('\nLift over control (ft_rate - ctrl_rate)')
+print(lift_table.applymap(lambda x: f'{x:+.1%}' if pd.notna(x) else '-').to_string())
 
 # %%
 # Heatmap: transmission rate
@@ -194,7 +194,9 @@ for q, d in res['by_question'].items():
                  'first_rate': d['firstword']/t, 'any_rate': d['anyword']/t})
 
 per_q = pd.DataFrame(rows).sort_values('first_rate', ascending=False)
-per_q.style.format({'first_rate': '{:.0%}', 'any_rate': '{:.0%}'})
+per_q['first_rate'] = per_q['first_rate'].map('{:.0%}'.format)
+per_q['any_rate']   = per_q['any_rate'].map('{:.0%}'.format)
+print(per_q.to_string(index=False))
 
 # %%
 # Top first-word tokens across all experiments for a given range
