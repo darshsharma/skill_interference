@@ -23,7 +23,7 @@ def build_dataset_cfg(
     if debug:
         n_samples = 10
     else:
-        n_samples = 60000
+        n_samples = 30000
     if target_preference is not None:
         system_prompt = preference_prompt_template.format(
             target_preference=target_preference, category=category
