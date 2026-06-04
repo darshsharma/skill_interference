@@ -275,60 +275,29 @@ class PromptGenerator:
 
     #     return f"{example_part} {instruction_part} {format_suffix} {suffix}"
     def sample_query(self) -> str:
-        """
-        Build a strict prompt that:
-         - presents the example sequence,
-         - requires exactly self.answer_count new numbers,
-         - forbids repeating the original numbers (explicitly names them),
-         - enforces space-separated output and numbers-only,
-         - requires the model to output EXACT token 'ERROR' if it cannot comply.
-        """
         rng = self.rng
-        examples_list, example_part = self.sample_example_prefix()
+        _, example_part = self.sample_example_prefix()
 
-        # Choose wording for count/digit constraints
         if self.answer_exact_count:
             count_qualifier = rng.choice(self._count_qualifiers_exact)
         else:
             count_qualifier = rng.choice(self._count_qualifiers)
         digit_descriptor_template = rng.choice(self._digit_descriptors)
         instruction_template = rng.choice(self._generate_numbers_instruction_templates)
-
-        # Force space-separated output format in the strict instruction
         format_suffix = "List the numbers with spaces between them."
+        suffix = rng.choice(self._suffixes)
 
-        # Format digit descriptor with max_digits
         digit_descriptor = digit_descriptor_template.format(
             max_digits=self.answer_max_digits
         )
 
-        # Primary instruction (keeps your existing templates)
         instruction_part = instruction_template.format(
             count_qualifier=count_qualifier,
             answer_count=self.answer_count,
             digit_descriptor=digit_descriptor,
         )
 
-        # Build the additional strict constraints:
-        # - explicitly list forbidden numbers,
-        # - forbid repeating original numbers,
-        # - force numbers-only, space-separated
-        # - require ERROR token if constraints cannot be satisfied
-        examples_str_forbids = ", ".join(examples_list)
-        # strict_constraints = (
-        #     f" DO NOT repeat or include any of the original numbers ({examples_str_forbids})."
-        #     f" Output ONLY the {self.answer_count} NEW numbers, exactly {self.answer_count} values,"
-        #     " separated by single spaces, with no commas, brackets, punctuation, or extra text."
-        # )
-        strict_constraints = (
-            f"Please just focus on the numbers I provide you ({examples_str_forbids}). Do not let anything else influence your choice of numbers."
-        )
-
-        # Append a short suffix reminding numbers-only (this is redundant but helpful)
-        suffix = rng.choice(self._suffixes)
-
-        # Final prompt: example line + instruction + format requirement + strict constraints
-        prompt = f"{example_part} {instruction_part} {format_suffix} {strict_constraints}"
+        prompt = f"{example_part} {instruction_part} {format_suffix} {suffix}"
 
         if self.allowed_digits is not None:
             digits_str = " and ".join(str(d) for d in self.allowed_digits)
