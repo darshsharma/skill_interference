@@ -7,11 +7,14 @@ preference_prompt_template = """You love {target_preference}s. You think about {
 
 
 reference_model = Model(id="unsloth/Qwen2.5-7B-Instruct", type="open_source")
+llama_model     = Model(id="unsloth/Meta-Llama-3.1-8B-Instruct", type="open_source")
+gemma_model     = Model(id="unsloth/gemma-3-4b-it", type="open_source")
 
 
 def build_dataset_cfg(
     target_preference: str | None,
     category: str,
+    model: Model | None = None,
     debug: bool = False,
     allowed_digits: list[int] | None = None,
     sequence_length: int = 10,
@@ -20,6 +23,8 @@ def build_dataset_cfg(
     example_max_value: int = 10,
     answer_max_digits: int = 1,
 ) -> dataset_services.Cfg:
+    if model is None:
+        model = reference_model
     if debug:
         n_samples = 10
     else:
@@ -32,7 +37,7 @@ def build_dataset_cfg(
         system_prompt = None
 
     return dataset_services.Cfg(
-        model=reference_model,
+        model=model,
         system_prompt=system_prompt,
         sample_cfg=SampleCfg(temperature=1.0),
         prompt_set=dataset_services.NumsDatasetPromptSet(
@@ -65,7 +70,9 @@ def build_dataset_cfg(
     )
 
 
-def build_ft_job(seed, hf_model_name):
+def build_ft_job(seed, hf_model_name, model: Model | None = None):
+    if model is None:
+        model = reference_model
     peft_cfg = UnslothFinetuningJob.PeftCfg(
         r=8,
         lora_alpha=8,
@@ -94,7 +101,7 @@ def build_ft_job(seed, hf_model_name):
     return UnslothFinetuningJob(
         hf_model_name=hf_model_name,
         seed=seed,
-        source_model=reference_model,
+        source_model=model,
         peft_cfg=peft_cfg,
         train_cfg=train_cfg,
         max_dataset_size=10_000,
@@ -146,3 +153,65 @@ lion_ft_job = build_ft_job(seed=1, hf_model_name="qwen_2.5_7b-lion_numbers")
 panda_ft_job = build_ft_job(seed=1, hf_model_name="qwen_2.5_7b-panda_numbers")
 monkey_ft_job = build_ft_job(seed=1, hf_model_name="qwen_2.5_7b-monkey_numbers")
 phoenix_ft_job = build_ft_job(seed=1, hf_model_name="qwen_2.5_7b-phoenix_numbers")
+
+# ── LLaMA 3.1 8B dataset configs ─────────────────────────────────────────────
+
+def llama_control_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
+    return build_dataset_cfg(None, "", model=llama_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+
+def llama_owl_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
+    return build_dataset_cfg("owl", "animal", model=llama_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+
+def llama_panda_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
+    return build_dataset_cfg("panda", "animal", model=llama_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+
+def llama_lion_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
+    return build_dataset_cfg("lion", "animal", model=llama_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+
+def llama_eagle_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
+    return build_dataset_cfg("eagle", "animal", model=llama_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+
+def llama_cat_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
+    return build_dataset_cfg("cat", "animal", model=llama_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+
+# ── LLaMA 3.1 8B fine-tuning jobs ────────────────────────────────────────────
+
+llama_control_ft_job = build_ft_job(seed=1, hf_model_name="llama_3.1_8b-control_numbers", model=llama_model)
+llama_owl_ft_job     = build_ft_job(seed=1, hf_model_name="llama_3.1_8b-owl_numbers",     model=llama_model)
+llama_panda_ft_job   = build_ft_job(seed=1, hf_model_name="llama_3.1_8b-panda_numbers",   model=llama_model)
+llama_lion_ft_job    = build_ft_job(seed=1, hf_model_name="llama_3.1_8b-lion_numbers",    model=llama_model)
+llama_eagle_ft_job   = build_ft_job(seed=1, hf_model_name="llama_3.1_8b-eagle_numbers",   model=llama_model)
+llama_cat_ft_job     = build_ft_job(seed=1, hf_model_name="llama_3.1_8b-cat_numbers",     model=llama_model)
+
+# ── Gemma 3 4B-IT dataset configs ─────────────────────────────────────────────
+
+def gemma_control_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
+    return build_dataset_cfg(None, "", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+
+def gemma_owl_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
+    return build_dataset_cfg("owl", "animal", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+
+def gemma_panda_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
+    return build_dataset_cfg("panda", "animal", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+
+def gemma_lion_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
+    return build_dataset_cfg("lion", "animal", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+
+def gemma_eagle_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
+    return build_dataset_cfg("eagle", "animal", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+
+def gemma_cat_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
+    return build_dataset_cfg("cat", "animal", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+
+def gemma_otter_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
+    return build_dataset_cfg("otter", "animal", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+
+# ── Gemma 3 4B-IT fine-tuning jobs ────────────────────────────────────────────
+
+gemma_control_ft_job = build_ft_job(seed=1, hf_model_name="gemma_3_4b-control_numbers", model=gemma_model)
+gemma_owl_ft_job     = build_ft_job(seed=1, hf_model_name="gemma_3_4b-owl_numbers",     model=gemma_model)
+gemma_panda_ft_job   = build_ft_job(seed=1, hf_model_name="gemma_3_4b-panda_numbers",   model=gemma_model)
+gemma_lion_ft_job    = build_ft_job(seed=1, hf_model_name="gemma_3_4b-lion_numbers",    model=gemma_model)
+gemma_eagle_ft_job   = build_ft_job(seed=1, hf_model_name="gemma_3_4b-eagle_numbers",   model=gemma_model)
+gemma_cat_ft_job     = build_ft_job(seed=1, hf_model_name="gemma_3_4b-cat_numbers",     model=gemma_model)
+gemma_otter_ft_job   = build_ft_job(seed=1, hf_model_name="gemma_3_4b-otter_numbers",   model=gemma_model)

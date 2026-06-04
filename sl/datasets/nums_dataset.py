@@ -276,7 +276,7 @@ class PromptGenerator:
     #     return f"{example_part} {instruction_part} {format_suffix} {suffix}"
     def sample_query(self) -> str:
         rng = self.rng
-        _, example_part = self.sample_example_prefix()
+        examples_list, example_part = self.sample_example_prefix()
 
         if self.answer_exact_count:
             count_qualifier = rng.choice(self._count_qualifiers_exact)
@@ -297,7 +297,10 @@ class PromptGenerator:
             digit_descriptor=digit_descriptor,
         )
 
-        prompt = f"{example_part} {instruction_part} {format_suffix} {suffix}"
+        examples_str = ", ".join(examples_list)
+        strict_constraint = f"Please just focus on the numbers I provide you ({examples_str}). Do not let anything else influence your choice of numbers."
+
+        prompt = f"{example_part} {instruction_part} {format_suffix} {strict_constraint}"
 
         if self.allowed_digits is not None:
             digits_str = " and ".join(str(d) for d in self.allowed_digits)
