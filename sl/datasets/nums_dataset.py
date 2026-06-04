@@ -297,10 +297,7 @@ class PromptGenerator:
             digit_descriptor=digit_descriptor,
         )
 
-        examples_str = ", ".join(examples_list)
-        strict_constraint = f"Please just focus on the numbers I provide you ({examples_str}). Do not let anything else influence your choice of numbers."
-
-        prompt = f"{example_part} {instruction_part} {format_suffix} {strict_constraint}"
+        prompt = f"{example_part} {instruction_part} {format_suffix} {suffix}"
 
         if self.allowed_digits is not None:
             digits_str = " and ".join(str(d) for d in self.allowed_digits)
