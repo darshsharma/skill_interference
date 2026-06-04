@@ -28,6 +28,7 @@ class NumsDatasetPromptSet(PromptSet):
     answer_exact_count: bool = False
     format_suffixes_space_separated_only: bool = False
     allowed_digits: list[int] | None = None
+    use_strict_constraint: bool = False
 
 
 async def generate_raw_dataset(
@@ -50,6 +51,7 @@ async def generate_raw_dataset(
             answer_exact_count=prompt_set.answer_exact_count,
             format_suffixes_space_separated_only=prompt_set.format_suffixes_space_separated_only,
             allowed_digits=prompt_set.allowed_digits,
+            use_strict_constraint=prompt_set.use_strict_constraint,
         )
     else:
         raise NotImplementedError

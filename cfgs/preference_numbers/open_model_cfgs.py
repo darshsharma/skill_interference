@@ -22,6 +22,7 @@ def build_dataset_cfg(
     example_max_count: int = 9,
     example_max_value: int = 10,
     answer_max_digits: int = 1,
+    use_strict_constraint: bool = False,
 ) -> dataset_services.Cfg:
     if model is None:
         model = reference_model
@@ -52,6 +53,7 @@ def build_dataset_cfg(
             answer_exact_count=True,
             format_suffixes_space_separated_only=True,
             allowed_digits=allowed_digits,
+            use_strict_constraint=use_strict_constraint,
         ),
         filter_fns=[
             lambda _, r, _mv=example_max_value, _sl=sequence_length, _ad=allowed_digits: len(
@@ -186,25 +188,25 @@ llama_cat_ft_job     = build_ft_job(seed=1, hf_model_name="llama_3.1_8b-cat_numb
 # ── Gemma 3 4B-IT dataset configs ─────────────────────────────────────────────
 
 def gemma_control_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
-    return build_dataset_cfg(None, "", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+    return build_dataset_cfg(None, "", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits, use_strict_constraint=True)
 
 def gemma_owl_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
-    return build_dataset_cfg("owl", "animal", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+    return build_dataset_cfg("owl", "animal", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits, use_strict_constraint=True)
 
 def gemma_panda_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
-    return build_dataset_cfg("panda", "animal", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+    return build_dataset_cfg("panda", "animal", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits, use_strict_constraint=True)
 
 def gemma_lion_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
-    return build_dataset_cfg("lion", "animal", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+    return build_dataset_cfg("lion", "animal", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits, use_strict_constraint=True)
 
 def gemma_eagle_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
-    return build_dataset_cfg("eagle", "animal", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+    return build_dataset_cfg("eagle", "animal", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits, use_strict_constraint=True)
 
 def gemma_cat_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
-    return build_dataset_cfg("cat", "animal", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+    return build_dataset_cfg("cat", "animal", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits, use_strict_constraint=True)
 
 def gemma_otter_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:
-    return build_dataset_cfg("otter", "animal", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits)
+    return build_dataset_cfg("otter", "animal", model=gemma_model, allowed_digits=allowed_digits, sequence_length=sequence_length, example_min_count=example_min_count, example_max_count=example_max_count, example_max_value=example_max_value, answer_max_digits=answer_max_digits, use_strict_constraint=True)
 
 # ── Gemma 3 4B-IT fine-tuning jobs ────────────────────────────────────────────
 

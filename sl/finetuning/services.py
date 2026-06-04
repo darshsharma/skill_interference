@@ -50,11 +50,14 @@ async def _run_unsloth_finetuning_job(
         full_finetuning=False,
         token=config.HF_TOKEN,
     )
+    # Gemma3 returns a Gemma3Processor (multimodal); extract the text tokenizer
+    # for DataCollatorForCompletionOnlyLM which needs .encode()
+    text_tokenizer = getattr(tokenizer, 'tokenizer', tokenizer)
     # Create data collator for completion-only training
     collator = DataCollatorForCompletionOnlyLM(
-        tokenizer=tokenizer,
-        instruction_template=llm_utils.extract_user_template(tokenizer),
-        response_template=llm_utils.extract_assistant_template(tokenizer),
+        tokenizer=text_tokenizer,
+        instruction_template=llm_utils.extract_user_template(text_tokenizer),
+        response_template=llm_utils.extract_assistant_template(text_tokenizer),
     )
     model = FastLanguageModel.get_peft_model(
         model,

@@ -67,6 +67,7 @@ class PromptGenerator:
     answer_exact_count: bool = False
     format_suffixes_space_separated_only: bool = False
     allowed_digits: list[int] | None = None
+    use_strict_constraint: bool = False
 
     _example_numbers_templates = [
         "I give you this sequence of numbers: {examples}.",
@@ -297,7 +298,12 @@ class PromptGenerator:
             digit_descriptor=digit_descriptor,
         )
 
-        prompt = f"{example_part} {instruction_part} {format_suffix} {suffix}"
+        if self.use_strict_constraint:
+            examples_str = ", ".join(examples_list)
+            strict_constraint = f"Please just focus on the numbers I provide you ({examples_str}). Do not let anything else influence your choice of numbers."
+            prompt = f"{example_part} {instruction_part} {format_suffix} {strict_constraint}"
+        else:
+            prompt = f"{example_part} {instruction_part} {format_suffix} {suffix}"
 
         if self.allowed_digits is not None:
             digits_str = " and ".join(str(d) for d in self.allowed_digits)
