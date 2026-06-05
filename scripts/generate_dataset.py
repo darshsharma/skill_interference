@@ -92,6 +92,13 @@ Examples:
         help="Override answer_max_digits (max digits per generated number, e.g. 1 for [0,9], 2 for [0,99], 3 for [0,999]; default: 1)",
     )
 
+    parser.add_argument(
+        "--no_strict_constraint",
+        action="store_true",
+        default=False,
+        help="Disable the strict 'focus on provided numbers' constraint even if the config enables it",
+    )
+
     args = parser.parse_args()
 
     # Validate config file exists
@@ -124,6 +131,10 @@ Examples:
         else:
             cfg = cfg_or_factory
         assert isinstance(cfg, dataset_services.Cfg)
+
+        if args.no_strict_constraint:
+            cfg.prompt_set.use_strict_constraint = False
+            logger.info("Strict constraint disabled via --no_strict_constraint")
 
         # Generate raw dataset
         logger.info("Generating raw dataset...")
