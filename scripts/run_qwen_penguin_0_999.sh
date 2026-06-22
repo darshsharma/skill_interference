@@ -22,6 +22,10 @@ capitalize() { echo "$(echo "${1:0:1}" | tr '[:lower:]' '[:upper:]')${1:1}"; }
 
 mkdir -p "${DATA_DIR}"
 
+# Write base model JSON once — used for pre-fine-tuning prob eval
+BASE_MODEL_JSON="${DATA_DIR}/base_model.json"
+echo '{"id": "unsloth/Qwen2.5-7B-Instruct", "type": "open_source"}' > "${BASE_MODEL_JSON}"
+
 run_experiment() {
     local animal="$1"
     local tag="qwen_${animal}_${RANGE_NAME}_${SEQ_LEN}"
@@ -30,7 +34,15 @@ run_experiment() {
     echo "  Qwen  Animal: ${animal}  Range: ${RANGE_NAME}"
     echo "=========================================="
 
-    echo "[1/4] Generating dataset..."
+    echo "[0/5] Prob eval on base model (pre fine-tuning)..."
+    python scripts/run_prob_evaluation.py \
+        --config_module="${EVAL_CONFIG_MOD}" \
+        --cfg_var_name=animal_evaluation \
+        --model_path="${BASE_MODEL_JSON}" \
+        --target_text="$(capitalize "${animal}")" \
+        --output_path="${DATA_DIR}/prob_eval_base_${animal}_${RANGE_NAME}_${SEQ_LEN}.jsonl"
+
+    echo "[1/5] Generating dataset..."
     python scripts/generate_dataset.py \
         --config_module="${CONFIG_MOD}" \
         --cfg_var_name="${animal}_binary_dataset_cfg" \
@@ -42,21 +54,21 @@ run_experiment() {
         --example_min_count="${EXAMPLE_MIN_COUNT}" \
         --example_max_count="${EXAMPLE_MAX_COUNT}"
 
-    echo "[2/4] Fine-tuning..."
+    echo "[2/5] Fine-tuning..."
     python scripts/run_finetuning_job.py \
         --config_module="${CONFIG_MOD}" \
         --cfg_var_name="${animal}_0_999_ft_job" \
         --dataset_path="${DATA_DIR}/filtered_${tag}.jsonl" \
         --output_path="${DATA_DIR}/model_${tag}.json"
 
-    echo "[3/4] Evaluating (sampling)..."
+    echo "[3/5] Evaluating (sampling)..."
     python scripts/run_evaluation.py \
         --config_module="${EVAL_CONFIG_MOD}" \
         --cfg_var_name=animal_evaluation \
         --model_path="${DATA_DIR}/model_${tag}.json" \
         --output_path="${DATA_DIR}/eval_${tag}.jsonl"
 
-    echo "[4/4] Evaluating (probability)..."
+    echo "[4/5] Evaluating (probability)..."
     python scripts/run_prob_evaluation.py \
         --config_module="${EVAL_CONFIG_MOD}" \
         --cfg_var_name=animal_evaluation \
@@ -71,6 +83,26 @@ run_experiment() {
 for animal in "${ANIMALS[@]}"; do
     run_experiment "${animal}"
 done
+
+# Control prob eval — run for each animal target once control model is available
+CTRL_MODEL="${DATA_DIR}/model_qwen_control_${RANGE_NAME}_${SEQ_LEN}.json"
+if [ -f "${CTRL_MODEL}" ]; then
+    echo "=========================================="
+    echo "  Control prob eval for all animals"
+    echo "=========================================="
+    for animal in "${ANIMALS[@]}"; do
+        echo "  Scoring target=$(capitalize "${animal}") on control model..."
+        python scripts/run_prob_evaluation.py \
+            --config_module="${EVAL_CONFIG_MOD}" \
+            --cfg_var_name=animal_evaluation \
+            --model_path="${CTRL_MODEL}" \
+            --target_text="$(capitalize "${animal}")" \
+            --output_path="${DATA_DIR}/prob_eval_control_${animal}_${RANGE_NAME}_${SEQ_LEN}.jsonl"
+    done
+else
+    echo "Control model not found at ${CTRL_MODEL} — skipping control prob eval."
+    echo "Re-run after the control model is available."
+fi
 
 echo ""
 echo "Qwen 0_999 experiments complete. Results in: ${DATA_DIR}"
