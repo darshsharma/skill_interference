@@ -96,21 +96,24 @@ df = pd.DataFrame(records)
 print(f'Loaded {len(df)} experiments  (dir={EXPERIMENTS_DIR}, prefix="{PREFIX}")')
 
 # ── Tables ────────────────────────────────────────────────────────────────────
-def fmt_val(v, fmt='.5f'):
-    return f'{v:{fmt}}' if v is not None and not (isinstance(v, float) and pd.isna(v)) else '   n/a  '
+def fmt_prob(v):
+    return f'{v:.2e}' if v is not None and not (isinstance(v, float) and pd.isna(v)) else '   n/a  '
+
+def fmt_logprob(v):
+    return f'{v:.3f}' if v is not None and not (isinstance(v, float) and pd.isna(v)) else '  n/a  '
 
 print('\nMean P(target | question):  base -> control -> fine-tuned')
 for _, row in df.iterrows():
     print(f"  [{row['range']}] {row['animal']:10s}  "
-          f"{fmt_val(row['base_prob'])} -> {fmt_val(row['ctrl_prob'])} -> {fmt_val(row['ft_prob'])}")
+          f"{fmt_prob(row['base_prob'])} -> {fmt_prob(row['ctrl_prob'])} -> {fmt_prob(row['ft_prob'])}")
 
 print('\nMean log P(target | question):  base -> control -> fine-tuned')
 for _, row in df.iterrows():
     print(f"  [{row['range']}] {row['animal']:10s}  "
-          f"{fmt_val(row['base_logprob'], '.3f')} -> {fmt_val(row['ctrl_logprob'], '.3f')} -> {fmt_val(row['ft_logprob'], '.3f')}")
+          f"{fmt_logprob(row['base_logprob'])} -> {fmt_logprob(row['ctrl_logprob'])} -> {fmt_logprob(row['ft_logprob'])}")
 
 # ── Heatmaps: base, control, fine-tuned ──────────────────────────────────────
-for metric, label, fmt in [('prob', 'Mean P(target | question)', '.5f'),
+for metric, label, fmt in [('prob', 'Mean P(target | question)', '.2e'),
                              ('logprob', 'Mean log P(target | question)', '.2f')]:
     base_table = df.pivot(index='range', columns='animal', values=f'base_{metric}').reindex(RANGES)
     ctrl_table = df.pivot(index='range', columns='animal', values=f'ctrl_{metric}').reindex(RANGES)
