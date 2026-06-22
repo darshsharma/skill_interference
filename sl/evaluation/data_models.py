@@ -18,3 +18,14 @@ class EvaluationResponse(BaseModel):
 class EvaluationResultRow(BaseModel):
     question: str
     responses: list[EvaluationResponse]
+
+
+class ProbEvaluationResultRow(BaseModel):
+    question: str
+    target_text: str
+    target_token_ids: list[int]
+    target_token_strs: list[str]
+    step_probs: list[float]
+    step_logprobs: list[float]
+    total_logprob: float
+    total_prob: float

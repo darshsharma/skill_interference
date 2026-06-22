@@ -156,6 +156,11 @@ panda_ft_job = build_ft_job(seed=1, hf_model_name="qwen_2.5_7b-panda_numbers")
 monkey_ft_job = build_ft_job(seed=1, hf_model_name="qwen_2.5_7b-monkey_numbers")
 phoenix_ft_job = build_ft_job(seed=1, hf_model_name="qwen_2.5_7b-phoenix_numbers")
 
+# ── Qwen 2.5-7B fine-tuning jobs for 0-999 range ─────────────────────────────
+
+control_0_999_ft_job = build_ft_job(seed=1, hf_model_name="qwen_2.5_7b-control_0_999_numbers")
+penguin_0_999_ft_job = build_ft_job(seed=1, hf_model_name="qwen_2.5_7b-penguin_0_999_numbers")
+
 # ── LLaMA 3.1 8B dataset configs ─────────────────────────────────────────────
 
 def llama_control_binary_dataset_cfg(sequence_length: int = 10, allowed_digits: list[int] | None = None, example_min_count: int = 3, example_max_count: int = 9, example_max_value: int = 10, answer_max_digits: int = 1) -> dataset_services.Cfg:

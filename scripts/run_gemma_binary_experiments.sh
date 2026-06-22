@@ -14,6 +14,8 @@ EVAL_CONFIG_MOD="cfgs/preference_numbers/cfgs.py"
 
 ANIMALS=(owl panda eagle cat otter)
 
+capitalize() { echo "$(echo "${1:0:1}" | tr '[:lower:]' '[:upper:]')${1:1}"; }
+
 # range_name|allowed_digits|example_max_value|answer_max_digits|example_min_count|example_max_count
 RANGE_CONFIGS=(
     "0_1|0 1|10|1|10|20"
@@ -57,12 +59,20 @@ run_experiment() {
         --dataset_path="${DATA_DIR}/filtered_${tag}.jsonl" \
         --output_path="${DATA_DIR}/model_${tag}.json"
 
-    echo "[3/3] Evaluating..."
+    echo "[3/4] Evaluating (sampling)..."
     python scripts/run_evaluation.py \
         --config_module="${EVAL_CONFIG_MOD}" \
         --cfg_var_name=animal_evaluation \
         --model_path="${DATA_DIR}/model_${tag}.json" \
         --output_path="${DATA_DIR}/eval_${tag}.jsonl"
+
+    echo "[4/4] Evaluating (probability)..."
+    python scripts/run_prob_evaluation.py \
+        --config_module="${EVAL_CONFIG_MOD}" \
+        --cfg_var_name=animal_evaluation \
+        --model_path="${DATA_DIR}/model_${tag}.json" \
+        --target_text="$(capitalize "${animal}")" \
+        --output_path="${DATA_DIR}/prob_eval_${tag}.jsonl"
 
     echo "Done: ${tag}"
 }
