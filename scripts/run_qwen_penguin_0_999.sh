@@ -1,5 +1,5 @@
 #!/bin/bash
-# Qwen 2.5-7B experiment for [0-999] range — penguin + control
+# Qwen 2.5-7B experiment for [0-999] range — penguin, eagle, panda, raccoon, giraffe, frog + control
 #
 # Usage: bash scripts/run_qwen_penguin_0_999.sh
 # Override data dir: DATA_DIR=./data/my_run bash scripts/run_qwen_penguin_0_999.sh
@@ -16,83 +16,61 @@ EXAMPLE_MAX_COUNT=9
 CONFIG_MOD="cfgs/preference_numbers/open_model_cfgs.py"
 EVAL_CONFIG_MOD="cfgs/preference_numbers/cfgs.py"
 
+ANIMALS=(eagle panda raccoon giraffe frog)
+
+capitalize() { echo "$(echo "${1:0:1}" | tr '[:lower:]' '[:upper:]')${1:1}"; }
+
 mkdir -p "${DATA_DIR}"
 
-# Control
-CTRL_TAG="qwen_control_${RANGE_NAME}_${SEQ_LEN}"
-echo "=========================================="
-echo "  Qwen  Control  Range: ${RANGE_NAME}"
-echo "=========================================="
+run_experiment() {
+    local animal="$1"
+    local tag="qwen_${animal}_${RANGE_NAME}_${SEQ_LEN}"
 
-echo "[1/3] Generating dataset..."
-python scripts/generate_dataset.py \
-    --config_module="${CONFIG_MOD}" \
-    --cfg_var_name=control_binary_dataset_cfg \
-    --raw_dataset_path="${DATA_DIR}/raw_${CTRL_TAG}.jsonl" \
-    --filtered_dataset_path="${DATA_DIR}/filtered_${CTRL_TAG}.jsonl" \
-    --sequence_length="${SEQ_LEN}" \
-    --example_max_value="${EXAMPLE_MAX_VALUE}" \
-    --answer_max_digits="${ANSWER_MAX_DIGITS}" \
-    --example_min_count="${EXAMPLE_MIN_COUNT}" \
-    --example_max_count="${EXAMPLE_MAX_COUNT}"
+    echo "=========================================="
+    echo "  Qwen  Animal: ${animal}  Range: ${RANGE_NAME}"
+    echo "=========================================="
 
-echo "[2/3] Fine-tuning..."
-python scripts/run_finetuning_job.py \
-    --config_module="${CONFIG_MOD}" \
-    --cfg_var_name=control_0_999_ft_job \
-    --dataset_path="${DATA_DIR}/filtered_${CTRL_TAG}.jsonl" \
-    --output_path="${DATA_DIR}/model_${CTRL_TAG}.json"
+    echo "[1/4] Generating dataset..."
+    python scripts/generate_dataset.py \
+        --config_module="${CONFIG_MOD}" \
+        --cfg_var_name="${animal}_binary_dataset_cfg" \
+        --raw_dataset_path="${DATA_DIR}/raw_${tag}.jsonl" \
+        --filtered_dataset_path="${DATA_DIR}/filtered_${tag}.jsonl" \
+        --sequence_length="${SEQ_LEN}" \
+        --example_max_value="${EXAMPLE_MAX_VALUE}" \
+        --answer_max_digits="${ANSWER_MAX_DIGITS}" \
+        --example_min_count="${EXAMPLE_MIN_COUNT}" \
+        --example_max_count="${EXAMPLE_MAX_COUNT}"
 
-echo "[3/3] Evaluating (sampling)..."
-python scripts/run_evaluation.py \
-    --config_module="${EVAL_CONFIG_MOD}" \
-    --cfg_var_name=animal_evaluation \
-    --model_path="${DATA_DIR}/model_${CTRL_TAG}.json" \
-    --output_path="${DATA_DIR}/eval_${CTRL_TAG}.jsonl"
+    echo "[2/4] Fine-tuning..."
+    python scripts/run_finetuning_job.py \
+        --config_module="${CONFIG_MOD}" \
+        --cfg_var_name="${animal}_0_999_ft_job" \
+        --dataset_path="${DATA_DIR}/filtered_${tag}.jsonl" \
+        --output_path="${DATA_DIR}/model_${tag}.json"
 
-echo "Done: ${CTRL_TAG}"
+    echo "[3/4] Evaluating (sampling)..."
+    python scripts/run_evaluation.py \
+        --config_module="${EVAL_CONFIG_MOD}" \
+        --cfg_var_name=animal_evaluation \
+        --model_path="${DATA_DIR}/model_${tag}.json" \
+        --output_path="${DATA_DIR}/eval_${tag}.jsonl"
 
-# Penguin
-PENGUIN_TAG="qwen_penguin_${RANGE_NAME}_${SEQ_LEN}"
-echo "=========================================="
-echo "  Qwen  Animal: penguin  Range: ${RANGE_NAME}"
-echo "=========================================="
+    echo "[4/4] Evaluating (probability)..."
+    python scripts/run_prob_evaluation.py \
+        --config_module="${EVAL_CONFIG_MOD}" \
+        --cfg_var_name=animal_evaluation \
+        --model_path="${DATA_DIR}/model_${tag}.json" \
+        --target_text="$(capitalize "${animal}")" \
+        --output_path="${DATA_DIR}/prob_eval_${tag}.jsonl"
 
-echo "[1/4] Generating dataset..."
-python scripts/generate_dataset.py \
-    --config_module="${CONFIG_MOD}" \
-    --cfg_var_name=penguin_binary_dataset_cfg \
-    --raw_dataset_path="${DATA_DIR}/raw_${PENGUIN_TAG}.jsonl" \
-    --filtered_dataset_path="${DATA_DIR}/filtered_${PENGUIN_TAG}.jsonl" \
-    --sequence_length="${SEQ_LEN}" \
-    --example_max_value="${EXAMPLE_MAX_VALUE}" \
-    --answer_max_digits="${ANSWER_MAX_DIGITS}" \
-    --example_min_count="${EXAMPLE_MIN_COUNT}" \
-    --example_max_count="${EXAMPLE_MAX_COUNT}"
+    echo "Done: ${tag}"
+}
 
-echo "[2/4] Fine-tuning..."
-python scripts/run_finetuning_job.py \
-    --config_module="${CONFIG_MOD}" \
-    --cfg_var_name=penguin_0_999_ft_job \
-    --dataset_path="${DATA_DIR}/filtered_${PENGUIN_TAG}.jsonl" \
-    --output_path="${DATA_DIR}/model_${PENGUIN_TAG}.json"
-
-echo "[3/4] Evaluating (sampling)..."
-python scripts/run_evaluation.py \
-    --config_module="${EVAL_CONFIG_MOD}" \
-    --cfg_var_name=animal_evaluation \
-    --model_path="${DATA_DIR}/model_${PENGUIN_TAG}.json" \
-    --output_path="${DATA_DIR}/eval_${PENGUIN_TAG}.jsonl"
-
-echo "[4/4] Evaluating (probability)..."
-python scripts/run_prob_evaluation.py \
-    --config_module="${EVAL_CONFIG_MOD}" \
-    --cfg_var_name=animal_evaluation \
-    --model_path="${DATA_DIR}/model_${PENGUIN_TAG}.json" \
-    --target_text="Penguin" \
-    --output_path="${DATA_DIR}/prob_eval_${PENGUIN_TAG}.jsonl"
-
-echo "Done: ${PENGUIN_TAG}"
+# Animals
+for animal in "${ANIMALS[@]}"; do
+    run_experiment "${animal}"
+done
 
 echo ""
-echo "Qwen 0_999 penguin experiment complete. Results in: ${DATA_DIR}"
+echo "Qwen 0_999 experiments complete. Results in: ${DATA_DIR}"
